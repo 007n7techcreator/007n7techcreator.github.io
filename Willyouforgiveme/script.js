@@ -25,15 +25,19 @@ noButton.addEventListener('mouseover', function() {
     noButton.style.top = randomY + 'px';
 });
 
+// When the "No" button is clicked
+noButton.addEventListener('click', function() {
+    alert('¡No me perdonaste! :(');
+});
+
 // When the "Yes" button is clicked
 yesButton.addEventListener('click', function(event) {
     event.preventDefault(); // Prevent the form from submitting
 
-    // Hide the initial content and show the confirmation page
+    // Hide the initial content and show the fun cat
     container.classList.add('hidden');
-    confirmationPage.classList.remove('hidden'); // Show the confirmation page
     funCat.classList.remove('hidden'); // Show the fun cat
-
+});
     // Set up the countdown timer
     let countdown = 3;
     countdownSpan.textContent = countdown;
