@@ -13,7 +13,8 @@ body {
 }
 
 #noButton {
-    position: absolute;
+    /* position: absolute; */ /* Elimina esta línea */
+    margin-left: 10px; /* Agrega un margen a la izquierda para separarlo del botón "Sí" */
 }
 
 .hidden {
@@ -27,4 +28,19 @@ body {
 .fun-cat {
     text-align: center;
     margin-top: 20px; /* Add some margin to the top */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #3e8e41;
 }
