@@ -41,7 +41,7 @@ yesButton.addEventListener('click', function() {
         // When the countdown reaches 0, redirect to the "It's Raining Tacos" video
         if (countdown <= 0) {
             clearInterval(countdownInterval);
-            window.location.href = 'https://www.youtube.com/watch?v=aqqWozJ-Kfs'; // "It's Raining Tacos"
+            window.location.href = 'https://youtu.be/npjF032TDDQ?feature=shared'; // "It's Raining Tacos"
         }
     }, 1000); // Update the countdown every 1 second
 });
