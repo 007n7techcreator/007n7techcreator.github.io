@@ -32,8 +32,21 @@ yesButton.addEventListener('click', function() {
     confirmationPage.classList.add('hidden'); // Also hide the confirmation page
     funCat.classList.remove('hidden'); // Show the fun cat
 
-    // Stop the countdown
-    //clearInterval(countdownInterval); // Remove this line to let the countdown finish and redirect
+    // Set up the countdown timer
+    let countdown = 3;
+    countdownSpan.textContent = countdown;
+
+    const countdownInterval = setInterval(function() {
+        countdown--;
+        countdownSpan.textContent = countdown;
+
+        // When the countdown reaches 0, redirect to the new YouTube link
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            window.location.href = 'https://youtu.be/npjF032TDDQ?feature=shared';
+        }
+    }, 1000); // Update the countdown every 1 second
+});
 
     // Set up the countdown timer
     let countdown = 3;
