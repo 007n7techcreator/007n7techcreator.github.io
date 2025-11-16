@@ -49,6 +49,21 @@ yesButton.addEventListener('click', function(event) {
         }
     }, 1000); // Update the countdown every 1 second
 });
+    // Set up the countdown timer
+    let countdown = 3;
+    countdownSpan.textContent = countdown;
+
+    const countdownInterval = setInterval(function() {
+        countdown--;
+        countdownSpan.textContent = countdown;
+
+        // When the countdown reaches 0, redirect to the new YouTube link
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            window.location.href = 'https://youtu.be/npjF032TDDQ?feature=shared';
+        }
+    }, 1000); // Update the countdown every 1 second
+});
     countdownSpan.textContent = countdown;
 
     const countdownInterval = setInterval(function() {
