@@ -4,6 +4,7 @@ const noButton = document.getElementById('noButton');
 const container = document.querySelector('.container');
 const confirmationPage = document.getElementById('confirmationPage');
 const countdownSpan = document.getElementById('countdown');
+const funCat = document.getElementById('funCat'); // Get reference to the fun cat element
 
 // Make the "No" button move randomly when the mouse hovers over it
 noButton.addEventListener('mouseover', function() {
@@ -28,12 +29,27 @@ noButton.addEventListener('mouseover', function() {
 yesButton.addEventListener('click', function() {
     // Hide the initial content and show the confirmation page
     container.classList.add('hidden');
-    confirmationPage.classList.remove('hidden');
+    confirmationPage.classList.add('hidden'); // Also hide the confirmation page
+    funCat.classList.remove('hidden'); // Show the fun cat
+
+    // Stop the countdown
+    //clearInterval(countdownInterval); // Remove this line to let the countdown finish and redirect
 
     // Set up the countdown timer
     let countdown = 3;
     countdownSpan.textContent = countdown;
 
+    const countdownInterval = setInterval(function() {
+        countdown--;
+        countdownSpan.textContent = countdown;
+
+        // When the countdown reaches 0, redirect to the new YouTube link
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            window.location.href = 'https://youtu.be/npjF032TDDQ?feature=shared'; // New YouTube link
+        }
+    }, 1000); // Update the countdown every 1 second
+});
     const countdownInterval = setInterval(function() {
         countdown--;
         countdownSpan.textContent = countdown;
