@@ -49,6 +49,47 @@ function terminarJuego() {
 async function onClick() {
     const estado = gatito.getAttribute('data-estado');
     if (estado === 'normal') {
+        gatito.src = 'crying-kitten.jpg'; // Actualiza el nombre del archivo
+        gatito.setAttribute('data-estado', 'llorando');
+        sumarPunto();
+        gatito.style.visibility = 'hidden';//Oculta el gatito
+        await sleep(1000)
+        gatito.src = 'happy-cat.jpg'; // Actualiza el nombre del archivo
+        gatito.setAttribute('data-estado', 'normal');
+        moverGatito(); // Mueve el gatito a una nueva posición
+        gatito.style.visibility = 'visible'; //Hace visible al gatito
+    }
+}
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+botonInicio.addEventListener('click', iniciarJuego);
+botonReiniciar.addEventListener('click', iniciarJuego);
+botonPlay.addEventListener('click', iniciarJuego);
+botonHardmode.addEventListener('click', function() { // Añade este evento
+    window.location.href = 'https://007n7techcreator.github.io/CatchTheKitten/Hardmode';
+});
+
+// Mueve el gatito cada segundo
+setInterval(moverGatito, 1000);
+
+// Termina el juego después de 30 segundos (opcional)
+setTimeout(terminarJuego, 30000);
+    jugando = true;
+    finJuegoDiv.classList.add('oculto');
+    juegoDiv.classList.remove('oculto');
+    menuDiv.classList.add('oculto');
+    botonInicio.classList.add('oculto')
+    moverGatito(); // Mueve el gatito inmediatamente al iniciar
+}
+
+function terminarJuego() {
+    jugando = false;
+    finJuegoDiv.classList.remove('oculto');
+}
+async function onClick() {
+    const estado = gatito.getAttribute('data-estado');
+    if (estado === 'normal') {
         gatito.src = 'gatito_llorando.png';
         gatito.setAttribute('data-estado', 'llorando');
         sumarPunto();
