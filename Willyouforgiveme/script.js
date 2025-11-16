@@ -26,14 +26,29 @@ noButton.addEventListener('mouseover', function() {
 });
 
 // When the "Yes" button is clicked
-yesButton.addEventListener('click', function() {
+yesButton.addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the form from submitting
+
     // Hide the initial content and show the confirmation page
     container.classList.add('hidden');
-    confirmationPage.classList.add('hidden'); // Also hide the confirmation page
+    confirmationPage.classList.remove('hidden'); // Show the confirmation page
     funCat.classList.remove('hidden'); // Show the fun cat
 
     // Set up the countdown timer
     let countdown = 3;
+    countdownSpan.textContent = countdown;
+
+    const countdownInterval = setInterval(function() {
+        countdown--;
+        countdownSpan.textContent = countdown;
+
+        // When the countdown reaches 0, redirect to the new YouTube link
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            window.location.href = 'https://youtu.be/npjF032TDDQ?feature=shared';
+        }
+    }, 1000); // Update the countdown every 1 second
+});
     countdownSpan.textContent = countdown;
 
     const countdownInterval = setInterval(function() {
