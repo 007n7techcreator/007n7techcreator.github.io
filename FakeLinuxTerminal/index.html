@@ -20,7 +20,7 @@
         #terminal-output {
             white-space: pre-wrap;
             overflow-y: auto;
-            max-height: 80vh;
+            max-height: 70vh;
         }
 
         #terminal-input {
@@ -34,6 +34,179 @@
             box-sizing: border-box;
             outline: none;
         }
+
+        #repair-message {
+            color: yellow;
+            text-align: center;
+            margin-top: 20px;
+            display: none; /* Oculto inicialmente */
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal">
+        <div id="terminal-output"></div>
+        <input type="text" id="terminal-input" placeholder="Enter a command..." />
+    </div>
+    <div id="repair-message">System file corrupted. Initiating automatic repair in 60 seconds...</div>
+
+    <script>
+        const terminalOutput = document.getElementById('terminal-output');
+        const terminalInput = document.getElementById('terminal-input');
+        const repairMessage = document.getElementById('repair-message');
+
+        terminalInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const command = terminalInput.value;
+                terminalInput.value = ''; // Clear the input
+
+                // Print the entered command
+                terminalOutput.innerHTML += '<span style="color: white;">$ ' + command + '</span><br>';
+
+                // Simulate the command response
+                const response = simulateCommand(command);
+                terminalOutput.innerHTML += response + '<br>';
+
+                // Scroll to the end
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        });
+
+        function simulateCommand(command) {
+            switch (command) {
+                case 'ls':
+                    return 'file1.txt  file2.txt  directory1\nboot  etc  home  root  usr  var';
+                case 'ls -l':
+                    return 'drwxr-xr-x  2 user  user  4096 Jan  1 00:00 directory1\n-rw-r--r--  1 user  user   123 Jan  1 00:00 file1.txt\n-rw-r--r--  1 user  user   456 Jan  1 00:00 file2.txt';
+                case 'pwd':
+                    return '/home/user';
+                case 'cd directory1':
+                    return 'Navigating to directory1...';
+                case 'cd ..':
+                    return 'Navigating back...';
+                case 'mkdir new_directory':
+                    return 'Creating directory "new_directory"...';
+                case 'rm file1.txt':
+                    return 'Removing file "file1.txt"...';
+                case 'rmdir directory1':
+                    return 'Removing directory "directory1"...';
+                case 'uname -a':
+                    return 'Linux simulated 5.4.0-58-generic #64-Ubuntu SMP Tue Dec 8 12:12:00 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux';
+                case 'date':
+                    return 'Tue Jan 1 00:00:00 UTC 2024';
+                case 'whoami':
+                    return 'user';
+                case 'echo "Hello, world!"':
+                    return 'Hello, world!';
+                case 'ping google.com':
+                    return 'Pinging google.com...\n64 bytes from google.com: icmp_seq=1 ttl=64 time=0.123 ms';
+                case 'ifconfig':
+                    return 'eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500\n        inet 192.168.1.100  netmask 255.255.255.0  broadcast 192.168.1.255';
+                case 'clear':
+                    terminalOutput.innerHTML = ''; // Clear the screen
+                    return '';
+                case 'sudo apt update':
+                    return 'Simulating apt update...\n...';
+                case 'sudo apt install some_package':
+                    return 'Simulating apt install some_package...\n...';
+                case 'sudo apt upgrade':
+                    return 'Simulating apt upgrade...\n...';
+                case 'sudo reboot':
+                    return 'Simulating system reboot...';
+                case 'sudo shutdown -h now':
+                    return 'Simulating system shutdown...';
+                case 'sudo useradd newuser':
+                    return 'Simulating useradd newuser...\n...';
+                case 'sudo passwd newuser':
+                    return 'Simulating passwd newuser...\n...';
+                case 'git clone https://github.com/example/repo.git':
+                    return 'Cloning into \'repo\'...\nremote: Enumerating objects: 123, done.\nremote: Counting objects: 100% (123/123), done.\nremote: Compressing objects: 100% (90/90), done.\nremote: Total 123 (delta 45), reused 67 (delta 23), pack reused 0\nReceiving objects: 100% (123/123), 123 KB | 1.23 MB/s, done.\nResolving deltas: 100% (45/45), done.';
+                case 'rm -rf /':
+                    // Simula la eliminación de archivos del sistema
+                    showRepairMessage();
+                    return 'Simulating removal of all system files...';
+                case 'rm -rf /boot':
+                    // Simula la eliminación del directorio /boot
+                    showRepairMessage();
+                    return 'Simulating removal of /boot directory...';
+                case 'rm -rf /etc':
+                    // Simula la eliminación del directorio /etc
+                    showRepairMessage();
+                    return 'Simulating removal of /etc directory...';
+                case 'cat /etc/os-release':
+                    return 'NAME="Ubuntu"\nVERSION="20.04.1 LTS (Focal Fossa)"\nID=ubuntu\nID_LIKE=debian\nPRETTY_NAME="Ubuntu 20.04.1 LTS"\nVERSION_ID="20.04"\nHOME_URL="https://www.ubuntu.com/"\nSUPPORT_URL="https://help.ubuntu.com/"\nBUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"\nPRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"\nVERSION_CODENAME=focal\nUBUNTU_CODENAME=focal';
+                case 'df -h':
+                    return 'Filesystem      Size  Used Avail Use% Mounted on\nudev            3.9G     0  3.9G   0% /dev\ntmpfs           787M  9.1M  778M   2% /run\n/dev/vda1        39G  7.9G   30G  21% /';
+
+                case 'top':
+                    return 'top - 10:00:00 up 1 day,  1:23,  1 user,  load average: 0.00, 0.00, 0.00\nTasks: 123 total,   1 running, 122 sleeping,   0 stopped,   0 zombie\n%Cpu(s):  0.0 us,  0.0 sy,  0.0 ni, 100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st\nKiB Mem : 8000000 total, 123456 used, 676544 free,  12345 buffers\nKiB Swap: 1000000 total,      0 used, 1000000 free.   1234 cached Mem\n\n  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND\n    1 root      20   0   12345   6789   1234 S   0.0  0.1   0:00.00 systemd\n    2 root      20   0     123     45     67 S   0.0  0.0   0:00.00 kthreadd\n    3 root      20   0     123     45     67 S   0.0  0.0   0:00.00 kworker/0:0';
+
+                case 'ps aux':
+                    return 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot         1  0.0  0.1 12345  6789 ?        Ss   Jan01   0:00 /sbin/init\nroot         2  0.0  0.0   123   45 ?        S    Jan01   0:00 [kthreadd]\nroot         3  0.0  0.0   123   45 ?        I<   Jan01   0:00 [rcu_gp]';
+                case 'history':
+                    return '1  ls\n2  pwd\n3  cd ..\n4  git clone https://github.com/example/repo.git\n5  history';
+                case 'sudo service apache2 start':
+                    return 'Starting Apache2... (simulated)';
+                case 'sudo systemctl start nginx':
+                    return 'Starting Nginx... (simulated)';
+                case 'grep "error" /var/log/syslog':
+                    return 'Jan 01 00:00:00 systemd[1]: Some error occurred.\nJan 01 00:00:01 kernel: [12345.678] Another error.';
+                case 'man ls':
+                    return 'LS(1)                     Manual page for LS(1)\n\nNAME\n       ls - list directory contents\n\nSYNOPSIS\n       ls [OPTION]... [FILE]...\n\nDESCRIPTION\n       List  information  about the FILEs (the current directory by default).\n       Sort entries alphabetically if none of -cftuvSUX nor --sort  is  speci‐\n       fied.';
+                case 'nano file1.txt':
+                    return 'Opening file1.txt in nano editor... (simulated)';
+                case 'vim file2.txt':
+                    return 'Opening file2.txt in vim editor... (simulated)';
+                case 'wget http://example.com/file.txt':
+                    return 'Downloading file.txt from http://example.com/file.txt...\n--2024-01-01 00:00:00--  http://example.com/file.txt\nResolving example.com (example.com)...\nConnecting to example.com (example.com)|...\nHTTP request sent, awaiting response... 200 OK\nLength: 1234 (1.2K) [text/plain]\nSaving to: \'file.txt\'\n\n100%[===================>] 1,234       --.-K/s   in 0.001s\n\n2024-01-01 00:00:00 - Saved [1234/1234]';
+                case 'curl https://api.example.com/data':
+                    return '{\n  "data": "Some example data from the API",\n  "status": "success"\n}';
+                case 'head file1.txt':
+                    return 'First 10 lines of file1.txt... (simulated)';
+                case 'tail file2.txt':
+                    return 'Last 10 lines of file2.txt... (simulated)';
+                case 'grep "keyword" file1.txt':
+                    return 'Line from file1.txt containing "keyword"...';
+                case 'find / -name "important_file.txt"':
+                    return '/home/user/important_file.txt\n/root/important_file.txt';
+                case 'chmod +x script.sh':
+                    return 'Changing permissions of script.sh...';
+                case './script.sh':
+                    return 'Executing script.sh...';
+                case 'tar -czvf archive.tar.gz directory1':
+                    return 'Creating archive archive.tar.gz from directory1...';
+                case 'tar -xzvf archive.tar.gz':
+                    return 'Extracting archive.tar.gz...';
+                case 'apt search some_package':
+                    return 'Full text search "some_package"\n...\nsome_package - Some description of the package';
+                case 'exit':
+                    return 'Exiting terminal...';
+                case 'logout':
+                    return 'Logging out...';
+                case 'sudo halt':
+                    return 'Simulating system halt...';
+                case 'sudo poweroff':
+                    return 'Simulating system poweroff...';
+                case 'sudo fdisk -l':
+                    return 'Disk /dev/vda: 40 GiB, 42949672960 bytes, 83886080 sectors\nUnits: sectors of 1 * 512 = 512 bytes\nSector size (logical/physical): 512 bytes / 512 bytes\nI/O size (minimum/optimal): 512 bytes / 512 bytes\nDisklabel type: gpt\nDisk identifier: ...';
+                case 'route -n':
+                    return 'Kernel IP routing table\nDestination     Gateway         Genmask         Flags Metric Ref    Use Iface\n0.0.0.0         192.168.1.1     0.0.0.0         UG    0      0        0 eth0\n192.168.1.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0';
+                case 'less /var/log/syslog':
+                    return 'Opening /var/log/syslog in less... (simulated)';
+                case 'more /var/log/syslog':
+                    return 'Opening /var/log/syslog in more... (simulated)';
+                case 'head -n 20 /var/log/syslog':
+                    return 'First 20 lines of /var/log/syslog... (simulated)';
+                case 'tail -n 20 /var/log/syslog':
+                    return 'Last 20 lines of /var/log/syslog... (simulated)';
+                case 'lsof':
+                    return 'COMMAND   PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME\nsystemd     1 root  cwd    DIR  253,0     4096  12345 /\nsystemd     1 root  rtd    DIR  253,0     4096  12345 /\nsystemd     1 root  txt    REG  253,0  1234567  12345 /sbin/init';
+                case 'netstat -ant':
+                    return 'Active Internet connections (servers and established)\nProto Recv-Q Send-Q Local Address           Foreign Address         State\ntcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN\ntcp        0     52 192.168.1.100:22        1.2.3.4:12345           ESTABLISHED';
+                case 'ss -ant':
+                    return 'State   Recv-Q  Send-Q   Local Address:Port   Peer Address:Port  Process\nLISTEN  0       128          0.0.0.0:22        0.0.0.0:*              \nESTAB   0       0        192.168.1.100:22      1.2.3.4:12345          ';
+                case 'ip addr':
+                    return '1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 
     </style>
 </head>
 <body>
