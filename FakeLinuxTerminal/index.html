@@ -1,83 +1,174 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<!-- ADVANCED HACKERMAN TERMINAL: MATRIX FX + RETRO SOUNDS + FULL COMMAND LIBRARY + HACK TOOLS -->
+<html lang="en">
 <head>
-    <title>Linux Terminal</title>
-    <style>
-        body {
-            background-color: black;
-            color: lime;
-            font-family: monospace;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        #terminal {
-            padding: 20px;
-            height: 100vh;
-            box-sizing: border-box;
-        }
-
-        #terminal-output {
-            white-space: pre-wrap;
-            overflow-y: auto;
-            max-height: 70vh;
-        }
-
-        #terminal-input {
-            background-color: black;
-            color: lime;
-            border: none;
-            font-family: monospace;
-            font-size: 16px;
-            width: 100%;
-            padding: 5px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        #repair-message {
-            color: yellow;
-            text-align: center;
-            margin-top: 20px;
-            display: none; /* Oculto inicialmente */
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hackerman Terminal</title>
+<style>
+  body { margin:0; background:black; color:#00ff55; font-family:monospace; overflow:hidden; }
+  #matrixCanvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; opacity:0.15; }
+  #terminal { position:relative; z-index:5; height:100vh; padding:20px; display:flex; flex-direction:column; box-sizing:border-box; }
+  #output { flex:1; overflow-y:auto; white-space:pre-wrap; font-size:16px; }
+  #input-line { display:flex; border-top:1px solid #0f0; padding-top:6px; }
+  #cmd { flex:1; background:black; color:#00ff55; border:none; outline:none; font-size:16px; }
+</style>
 </head>
 <body>
-    <div id="terminal">
-        <div id="terminal-output"></div>
-        <input type="text" id="terminal-input" placeholder="Enter a command..." />
-    </div>
-    <div id="repair-message">System file corrupted. Initiating automatic repair in 60 seconds...</div>
+<canvas id="matrixCanvas"></canvas>
+<div id="terminal">
+  <div id="output"></div>
+  <div id="input-line">
+    <span>$ </span><input id="cmd" />
+  </div>
+</div>
 
-    <script>
-        const terminalOutput = document.getElementById('terminal-output');
-        const terminalInput = document.getElementById('terminal-input');
-        const repairMessage = document.getElementById('repair-message');
+<script>
+//--------------------------------------
+// MATRIX ANIMATION
+//--------------------------------------
+const c = document.getElementById("matrixCanvas");
+const ctx = c.getContext("2d");
+c.width = window.innerWidth;
+c.height = window.innerHeight;
 
-        terminalInput.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                const command = terminalInput.value;
-                terminalInput.value = ''; // Clear the input
+const letters = "アァカサタナハマヤャラワガザダバパ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const fontSize = 16;
+const columns = c.width / fontSize;
+let drops = [];
+for (let i = 0; i < columns; i++) drops[i] = 1;
 
-                // Print the entered command
-                terminalOutput.innerHTML += '<span style="color: white;">$ ' + command + '</span><br>';
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0,0,0,0.05)";
+  ctx.fillRect(0,0,c.width,c.height);
+  ctx.fillStyle = "#00ff55";
+  ctx.font = fontSize + "px monospace";
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters[Math.floor(Math.random() * letters.length)];
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > c.height && Math.random() > 0.95) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 40);
 
-                // Simulate the command response
-                const response = simulateCommand(command);
-                terminalOutput.innerHTML += response + '<br>';
+//--------------------------------------
+// RETRO SOUNDS
+//--------------------------------------
+const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+const typeSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+typeSound.volume = 0.2;
 
-                // Scroll to the end
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            }
-        });
+//--------------------------------------
+// COMMAND DATABASE (EXTENDED)
+//--------------------------------------
+const commands = {
+  "help": () => `CATEGORIES:
+ system | files | network | processes | package | info | kali | hacktools
+Use: help <category>` ,
 
-        function simulateCommand(command) {
-            switch (command) {
-                case 'ls':
-                    return 'file1.txt  file2.txt  directory1\nboot  etc  home  root  usr  var';
-                case 'ls -l':
-                    return 'drwxr-xr-x  2 user  user  4096 Jan  1 00:00 directory1\n-rw-r--r--  1 user  user   123 Jan  1 00:00 file1.txt\n-rw-r--r--  1 user  user   456 Jan  1 00:00 file2.txt';
+  "help hacktools": () => `Hack Tools:
+ hydra, nmap <ip>, dirsearch, sqlmap, nikto, ffuf, metasploit, msfconsole,
+ hashcat, aircrack-ng, airmon-ng, john, enum4linux, gobuster, wafw00f`,
+
+  "help system": () => `System:
+ uname -a, hostname, uptime, history, clear, reboot, shutdown, poweroff`,
+
+  "help files": () => `Files:
+ ls, ls -l, cd <dir>, mkdir <name>, touch <f>, cat <f>, mv, cp, rm, rm -rf`,
+
+  "help network": () => `Network:
+ ifconfig, ip addr, ping <host>, traceroute, nslookup, netstat, ss`,
+
+  "help package": () => `Package:
+ apt update, apt upgrade, apt install <pkg>, apt remove <pkg>`,
+
+  "help kali": () => `Kali:
+ nmap, aircrack-ng, airmon-ng, sqlmap, hydra, john, wireshark`,
+
+  "uname -a": () => `Linux Hackerman 6.1.0-kali x86_64`,
+  "whoami": () => `root`,
+  "pwd": () => `/root`,
+  "ls": () => `Desktop/ Downloads/ payloads/ exploits/`,
+  "ls -l": () => `drwxr-xr-x root root exploits
+-rwxr-xr-x root root hack.sh`,
+
+  "ifconfig": () => `eth0 192.168.1.34
+wlan0 192.168.1.37`,
+
+  "nmap": () => `Nmap scan...
+PORT STATE SERVICE
+22/tcp open ssh
+80/tcp open http`,
+
+  "hydra": () => `Hydra running... brute-force in progress...`,
+  "sqlmap": () => `sqlmap starting automatic injection testing...`,
+  "nikto": () => `Nikto web scanner running...`,
+  "msfconsole": () => `Metasploit Framework loaded.
+msf6 >`,
+  "gobuster": () => `Gobuster results:
+/admin
+/login
+/secret`,
+  "wafw00f": () => `Detected WAF: Cloudflare (simulated)`,
+
+  "clear": () => { output.innerHTML = ""; return ""; }
+};
+
+//--------------------------------------
+// DANGEROUS COMMAND DETECTION
+//--------------------------------------
+function dangerous(cmd){
+  return /rm -rf|format|mkfs|dd/.test(cmd);
+}
+
+function autoRepair(){
+  return `⚠ CRITICAL ERROR DETECTED
+System integrity compromised.
+Initiating AUTO-REPAIR in 5s...
+Restoring files...
+Repair complete.`;
+}
+
+//--------------------------------------
+// EXECUTION ENGINE
+//--------------------------------------
+function execCommand(cmd){
+  if(dangerous(cmd)){
+    return autoRepair();
+  }
+
+  if(commands[cmd]){
+    return commands[cmd]();
+  }
+
+  return `Command not found: ${cmd}`;
+}
+
+//--------------------------------------
+// TERMINAL INPUT HANDLER
+//--------------------------------------
+const output = document.getElementById("output");
+const cmdInput = document.getElementById("cmd");
+
+cmdInput.addEventListener("keydown", e => {
+  if(e.key === "Enter"){
+    const cmd = cmdInput.value.trim();
+    beep.play();
+    output.innerHTML += `$ ${cmd}
+`;
+
+    const result = execCommand(cmd);
+    output.innerHTML += result + "
+";
+
+    cmdInput.value = "";
+    output.scrollTop = output.scrollHeight;
+  }
+});
+</script>
+</body>
+</html>
                 case 'pwd':
                     return '/home/user';
                 case 'cd directory1':
