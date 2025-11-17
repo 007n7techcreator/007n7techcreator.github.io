@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>You Are An Idiot</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            overflow: hidden; /* Evita barras de scroll */
+        }
+        .idiot {
+            font-size: 2em;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Warning!</h1>
+    <p class="idiot">You are an idiot!</p>
+    <img src="https://i.imgur.com/WjxufCu.gif" alt="Happy Faces" width="200">
+
+    <audio id="audio" src="https://www.myinstants.com/media/sounds/you-are-an-idiot.mp3" autoplay loop></audio>
+
+    <script>
+        window.onload = function() {
+            // Sonido en bucle
+            var audio = document.getElementById("audio");
+            audio.play();
+
+            // Ventanas que se mueven
+            function openMovingWindow() {
+                var newWindow = window.open('', '_blank', 'width=200,height=200');
+                if (newWindow) {
+                    newWindow.document.body.innerHTML = '<p>You are an idiot!</p>';
+                    newWindow.focus();
+
+                    // Movimiento aleatorio
+                    function moveWindow() {
+                        var x = Math.random() * (window.innerWidth - 200);
+                        var y = Math.random() * (window.innerHeight - 200);
+                        newWindow.moveTo(x, y);
+                    }
+
+                    setInterval(moveWindow, 100); // Mueve la ventana cada 100ms
+                }
+            }
+
+            // Abre varias ventanas
+            for (let i = 0; i < 5; i++) {
+                openMovingWindow();
+            }
+        };
+
+        window.onbeforeunload = function() {
+            return "Are you sure you want to leave?";
+        };
+    </script>
+</body>
+</html>
