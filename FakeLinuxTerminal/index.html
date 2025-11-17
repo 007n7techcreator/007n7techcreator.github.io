@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Linux Terminal</title>
+    <style>
+        body {
+            background-color: black;
+            color: lime;
+            font-family: monospace;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #terminal {
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        #terminal-output {
+            white-space: pre-wrap;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        #terminal-input {
+            background-color: black;
+            color: lime;
+            border: none;
+            font-family: monospace;
+            font-size: 16px;
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="terminal">
+        <div id="terminal-output"></div>
+        <input type="text" id="terminal-input" placeholder="Enter a command..." />
+    </div>
+
+    <script>
+        const terminalOutput = document.getElementById('terminal-output');
+        const terminalInput = document.getElementById('terminal-input');
+
+        terminalInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const command = terminalInput.value;
+                terminalInput.value = ''; // Clear the input
+
+                // Print the entered command
+                terminalOutput.innerHTML += '<span style="color: white;">$ ' + command + '</span><br>';
+
+                // Simulate the command response
+                const response = simulateCommand(command);
+                terminalOutput.innerHTML += response + '<br>';
+
+                // Scroll to the end
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        });
+
+        function simulateCommand(command) {
+            // Here you can add logic to simulate different commands
+            switch (command) {
+                case 'ls':
+                    return 'file1.txt  file2.txt  directory1';
+                case 'pwd':
+                    return '/home/user';
+                case 'uname -a':
+                    return 'Linux simulated 5.4.0-58-generic #64-Ubuntu SMP Tue Dec 8 12:12:00 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux';
+                case 'help':
+                    return 'Available commands: ls, pwd, uname -a';
+                default:
+                    return 'Command not recognized. Type "help" to see available commands.';
+            }
+        }
+    </script>
+</body>
+</html>
