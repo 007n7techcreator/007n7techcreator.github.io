@@ -4,7 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>System Breach — Demo</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    :root{--bg:#081018;--panel:#07121a;--accent:#00ff7f;--muted:#90b0c0}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{background:radial-gradient(ellipse at center,#051019 0%, #000000 70%);color:var(--accent);font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace}
+    .wrap{height:100vh;display:flex;align-items:center;justify-content:center;padding:30px}
+    .terminal{width:min(1000px,96%);max-width:1100px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
+    .header{display:flex;gap:10px;align-items:center;padding:12px 16px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-bottom:1px solid rgba(255,255,255,0.02)}
+    .dots{display:flex;gap:8px}
+    .dot{width:12px;height:12px;border-radius:50%;opacity:.9}
+    .dot.red{background:#ff5f56}
+    .dot.yellow{background:#ffbd2e}
+    .dot.green{background:#27c93f}
+    .title{margin-left:auto;color:var(--muted);font-size:13px}
+
+    .screen{padding:24px;min-height:420px;background:linear-gradient(180deg, rgba(3,10,12,0.2), rgba(0,0,0,0));}
+    .line{line-height:1.5;font-size:15px;white-space:pre-wrap}
+    .cursor{display:inline-block;width:9px;height:18px;background:var(--accent);margin-left:6px;vertical-align:middle;animation:blink .9s steps(2) infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    .progress-wrap{margin-top:18px}
+    .progress{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0%;background:linear-gradient(90deg, rgba(0,255,127,0.12), rgba(0,255,127,0.18));transition:width .25s ease}
+    .meta{margin-top:8px;color:var(--muted);font-size:13px}
+
+    .big-warning{margin-top:22px;background:rgba(255,0,0,0.06);color:#ff8080;padding:14px;border-radius:8px;border:1px solid rgba(255,0,0,0.08);display:none}
+
+    .reveal{display:none;margin-top:18px;padding:20px;background:#07121a;border-radius:10px;color:var(--muted);font-size:15px}
+
+    .controls{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
+    button{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer;font-family:inherit}
+    button.primary{border-color:rgba(0,255,127,0.15);color:var(--accent)}
+    small.note{display:block;color:var(--muted);font-size:12px;margin-top:8px}
+
+    @media (max-width:520px){.screen{padding:16px}.header{padding:10px}.title{display:none}}
+  </style>
 </head>
 <body>
   <div class="wrap">
@@ -23,17 +58,103 @@
         <div class="line" id="terminal"></div>
 
         <div class="progress-wrap">
-          <div class="progress"><div class="bar" id="bar"></div></div>
+          <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
           <div class="meta" id="meta">Connecting to remote host...</div>
         </div>
 
-        <div class="big-warning" id="warning">
-          ERROR: download interrupted. SYSTEM COMPROMISED — shutting down non-essential services.
-        </div>
+        <div class="big-warning" id="warning">ERROR: download interrupted. SYSTEM COMPROMISED — shutting down non-essential services.</div>
 
         <div class="reveal" id="reveal">
           <strong>JUST A PRANK</strong>
-          <p style="margin-top:8px">
+          <p style="margin-top:8px">This page is only a visual prank — it doesn't perform any real hacking. Share responsibly.</p>
+        </div>
+
+      </div>
+
+      <div class="controls">
+        <button id="restart">Restart Demo</button>
+        <button class="primary" id="start">Run Prank</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const terminal = document.getElementById('terminal');
+    const bar = document.getElementById('bar');
+    const meta = document.getElementById('meta');
+    const warning = document.getElementById('warning');
+    const reveal = document.getElementById('reveal');
+    const startBtn = document.getElementById('start');
+    const restartBtn = document.getElementById('restart');
+
+    function randomIP(){ return [Math.floor(Math.random()*255),Math.floor(Math.random()*255),Math.floor(Math.random()*255),Math.floor(Math.random()*255)].join('.') }
+    function randomHex(len){ let s=''; const chars='abcdef0123456789'; for(let i=0;i<len;i++) s+=chars[Math.floor(Math.random()*chars.length)]; return s }
+
+    let running=false;
+    function typeLines(lines, i=0, cb){
+      if(i>=lines.length){ cb && cb(); return }
+      const line = lines[i];
+      let pos=0;
+      const el = document.createElement('div'); el.className='line'; terminal.appendChild(el);
+      const cursor = document.createElement('span'); cursor.className='cursor';
+      const typer = setInterval(()=>{
+        if(pos<line.length){ el.textContent += line[pos++]; }
+        else{ clearInterval(typer); el.appendChild(cursor); setTimeout(()=>{ el.removeChild(cursor); typeLines(lines,i+1,cb); }, 500) }
+      }, 18 + Math.random()*40);
+      terminal.scrollIntoView({behavior:'smooth',block:'end'});
+    }
+
+    function runDemo(){
+      if(running) return; running=true;
+      terminal.textContent=''; meta.textContent='Establishing connection...'; bar.style.width='0%'; warning.style.display='none'; reveal.style.display='none';
+
+      const session = [
+        `> sudo init_connection --target ${randomIP()}`,
+        `> handshake: OK`,
+        `> retrieving system info...`,
+        `> host: server-${randomHex(6)}`,
+        `> user: admin`,
+        `> permission: root`,
+        `> downloading payload: 0%`
+      ];
+
+      typeLines(session,0,()=>{
+        let p=0;
+        const step = setInterval(()=>{
+          p += Math.floor(Math.random()*8)+3;
+          if(p>100) p=100;
+          bar.style.width = p + '%';
+          meta.textContent = `Downloading payload: ${p}% — ${randomHex(4)}.bin`;
+          if(p===100){ clearInterval(step);
+             setTimeout(()=>{
+               meta.textContent = 'Failed to download payload: checksum mismatch';
+               warning.style.display='block';
+               // dramatic "explosion" sequence
+               let ecount=0;
+               const expl = setInterval(()=>{
+                 const l = document.createElement('div'); l.className='line'; l.textContent = `!!! CRITICAL ERROR [CODE: ${randomHex(8)}] — initiating catastrophic failover (${ecount+1}/4)`; terminal.appendChild(l);
+                 ecount++;
+                 if(ecount>=4){ clearInterval(expl);
+                   const end = document.createElement('div'); end.className='line'; end.innerHTML = `<strong>*** SYSTEM OBLITERATED ***</strong>`; terminal.appendChild(end);
+                   // reveal prank tag
+                   setTimeout(()=>{ reveal.style.display='block'; running=false; restartBtn.style.display='inline-block'; }, 900); }, 900);
+                 }
+               }, 650);
+             }, 700);
+          }
+        }, 250);
+      });
+    }
+
+    startBtn.addEventListener('click', ()=>{ startBtn.style.display='none'; restartBtn.style.display='none'; runDemo(); });('click', runDemo);
+    restartBtn.addEventListener('click', ()=>{ running=false; terminal.textContent=''; bar.style.width='0%'; meta.textContent='Ready.'; warning.style.display='none'; reveal.style.display='none'; startBtn.style.display='inline-block'; restartBtn.style.display='none'; });('click', ()=>{ running=false; terminal.textContent=''; bar.style.width='0%'; meta.textContent='Ready.'; warning.style.display='none'; reveal.style.display='none'; });
+
+    // Auto-run small preview after load
+    window.addEventListener('load', ()=>{ meta.textContent='Ready.'; setTimeout(()=>{ runDemo() }, 700); });
+  </script>
+</body>
+</html>
             This page is only a visual prank — it doesn't perform any real hacking. Share responsibly.
           </p>
         </div>
