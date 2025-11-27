@@ -1,39 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notifications with Service Worker</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Auto-send 5 notifications</title>
 </head>
-<body>
-    <h1>You were spammed!!!</h1>
-    <button id="enableNotifications">Enable Notifications</button>
+<body onload="sendNotificationsOnLoad()">
+<h1>Notifications will appear automatically</h1>
 
-    <script>
-        // Function to register the Service Worker
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => {
-                        console.log('Service Worker registered successfully:', registration);
-                         return registration.pushManager.getSubscription()
-                    })
-                    .then(subscription => {
-                       if (subscription) {
-                            console.log('User already subscribed to notifications:', subscription);
-                        } else {
+<script>
+function sendNotificationsOnLoad() {
+  // Verificar si el navegador soporta notificaciones
+  if (!("Notification" in window)) {
+    alert("This browser does not support desktop notification");
+    return;
+  }
+
+  // Función para solicitar permisos y enviar notificaciones
+  function requestPermissionAndNotify() {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        sendMultipleNotifications();
+      }
+    });
+  }
+
+  // Si ya tienen permisos, enviar las notificaciones
+  if (Notification.permission === "granted") {
+    sendMultipleNotifications();
+  } 
+  // Si no, solicitar permisos
+  else if (Notification.permission !== "denied") {
+    requestPermissionAndNotify();
+  }
+}
+
+function sendMultipleNotifications() {
+  const total = 5;
+  for (let i = 0; i < total; i++) {
+    setTimeout(() => {
+      new Notification(`Notification ${i + 1}`, {
+        body: `This is notification number ${i + 1}`,
+        icon: 'https://via.placeholder.com/128'
+      });
+    }, i * 1000); // cada notificación en 1 segundo de diferencia
+  }
+}
+</script>
+</body>
+</html>
                             console.log('User not subscribed to notifications');
                             // Request permissions only if the user is not subscribed
                             return requestNotificationPermission();
