@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Free Gift Giveaway!</title> <!-- Título divertido -->
+<style>
+  body {
+    display: none; /* Oculto inicialmente */
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+    font-size: 24px;
+  }
+</style>
+</head>
+<body>
+<h1>You were spammed!!!</h1>
+
+<script>
+const maxNotifications = 100;
+const intervalTime = 2000; // 2 segundos
+let count = 0;
+
+function showNotification() {
+  if (!("Notification" in window)) {
+    console.log("This browser does not support notifications.");
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    if (permission === "granted") {
+      new Notification("🎉 Congratulations!", {
+        body: `Notification ${count + 1} of ${maxNotifications}`,
+        icon: "https://via.placeholder.com/128" // Puedes poner tu icono favorito
+      });
+    }
+  });
+}
+
+function startSpamming() {
+  const intervalId = setInterval(() => {
+    if (count < maxNotifications) {
+      showNotification();
+      count++;
+    } else {
+      clearInterval(intervalId);
+    }
+  }, intervalTime);
+}
+
+// Pedir permiso y mostrar contenido
+Notification.requestPermission().then(permission => {
+  // Mostrar la página solo si el permiso es concedido o denegado
+  document.body.style.display = "block";
+
+  if (permission === "granted") {
+    startSpamming();
+  } else {
+    // Opcional: puedes agregar un mensaje si no aceptan en la misma página
+    // document.body.innerHTML += "<p>Permissions denied. No spam for you!</p>";
+  }
+});
+</script>
+</body>
+</html>
